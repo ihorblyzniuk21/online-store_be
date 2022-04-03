@@ -33,6 +33,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isActivated: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    activationLink: {
+      type: DataTypes.STRING,
+    },
     role: {
       type: DataTypes.STRING,
       defaultValue: "USER"

@@ -12,4 +12,4 @@ class TypeService {
 	}
 }
 
-module.exports = new TypeService;
+module.exports = new TypeService();

@@ -20,4 +20,4 @@ class TypeController {
 	}
 }
 
-module.exports = new TypeController;
+module.exports = new TypeController();

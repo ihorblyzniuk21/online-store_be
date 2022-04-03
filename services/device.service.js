@@ -53,7 +53,7 @@ class DeviceService {
 	async getOne(id) {
 		const device = await Device.findOne(
 			{
-				where: {id},
+				where: { id },
 				include: [{model: DeviceInfo, as: 'info'}]
 			},
 		)
@@ -61,4 +61,4 @@ class DeviceService {
 	}
 }
 
-module.exports = new DeviceService;
+module.exports = new DeviceService();

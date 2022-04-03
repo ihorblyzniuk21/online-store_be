@@ -21,4 +21,4 @@ class BrandController {
 }
 
 
-module.exports = new BrandController;
+module.exports = new BrandController();

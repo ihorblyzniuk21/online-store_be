@@ -13,4 +13,4 @@ class BrandService {
 	}
 }
 
-module.exports = new BrandService;
+module.exports = new BrandService();
