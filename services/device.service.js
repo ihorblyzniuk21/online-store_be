@@ -27,7 +27,6 @@ class DeviceService {
 	}
 
 	async getAll(body) {
-		console.log("BODY", body)
 		let { brandId, typeId, limit, page } = body;
 		page = page || 1
 		limit = Number(limit || 9)
@@ -35,17 +34,45 @@ class DeviceService {
 
 		let devices;
 		if(!brandId && !typeId) {
-			devices = await Device.findAndCountAll({where: {}, limit, offset})
+			devices = await Device.findAndCountAll({
+				include: [
+					{ model: DeviceInfo, as: "info" }
+				],
+				limit,
+				offset
+				}
+			)
 		}
 		if(brandId && !typeId) {
-			devices = await Device.findAndCountAll({where: {brandId}, limit, offset})
+			devices = await Device.findAndCountAll({
+				where: {brandId},
+				include: [
+					{ model: DeviceInfo, as: "info" }
+				],
+				limit,
+				offset
+			})
 		}
 		if(typeId && !brandId) {
-			devices = await Device.findAndCountAll({where: {typeId}, limit, offset})
+			devices = await Device.findAndCountAll({
+				where: {typeId},
+				include: [
+					{ model: DeviceInfo, as: "info" }
+				],
+				limit,
+				offset
+			})
 		}
 
 		if(brandId && typeId) {
-			devices = await Device.findAndCountAll({where: {brandId, typeId}, limit, offset})
+			devices = await Device.findAndCountAll({
+				where: {brandId, typeId},
+				include: [
+					{ model: DeviceInfo, as: "info" }
+				],
+				limit,
+				offset
+			})
 		}
 		return devices;
 	}

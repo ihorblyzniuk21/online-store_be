@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Basket, BasketDevice } = require('../models');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const MailService = require('./mail.service');
@@ -7,25 +7,63 @@ const UserDto = require('../helpers/user-dto');
 const ApiError = require('../helpers/api-error');
 
 class UserService {
-	async registration({name, email, password}) {
-		const candidate = await User.findOne({where: {email}});
+	async registration({name, email, password, role}) {
+		const candidate = await User.findOne({ where: { email } });
 		if (candidate) {
 			throw ApiError.BadRequest(`Email ${email} has already been taken!`)
 		}
 		const hashPassword = await bcrypt.hash(password, 3);
 		const activationLink = uuid.v4();
-		const user = await User.create({ name, email, password: hashPassword, activationLink });
+		const createdUser = await User.create({ name, role, email, password: hashPassword, activationLink });
+		const basket = await Basket.create({ userId: createdUser.id });
+
+		const user = await User.findOne({
+			where: { email: createdUser.email },
+			attributes: ['id', 'email', 'isActivated', 'name', 'role', 'createdAt', 'updatedAt'],
+			include: [
+				{
+					model: Basket,
+					as: 'basket',
+					attributes: ['id'],
+					include: [
+						{
+							model: BasketDevice,
+							as: 'basket_devices',
+							attributes: ['id', 'deviceId']
+						}
+					]
+				}
+			]
+		});
+
 		await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
 		const userDto = new UserDto(user);
 		const tokens = TokenService.generateTokens({...userDto});
 		await TokenService.saveToken(userDto.id, tokens.refreshToken);
 
-		return { ...tokens, user: userDto }
+		return { ...tokens, user }
 	}
 
-	async login({name, email, password}) {
-		const user = await User.findOne({where: {email}});
+	async login({ email, password }) {
+		const user = await User.findOne({
+			where: { email },
+			attributes: ['id', 'email', 'isActivated', 'name', 'role', 'createdAt', 'updatedAt'],
+			include: [
+				{
+					model: Basket,
+					as: 'basket',
+					attributes: ['id'],
+					include: [
+						{
+							model: BasketDevice,
+							as: 'basket_devices',
+							attributes: ['id', 'deviceId']
+						}
+					]
+				}
+			]
+		});
 		if(!user) {
 			throw ApiError.BadRequest(`User not found`);
 		}
@@ -37,7 +75,7 @@ class UserService {
 		const tokens = TokenService.generateTokens({...userDto});
 		await TokenService.saveToken(userDto.id, tokens.refreshToken);
 
-		return { ...tokens, user: userDto }
+		return { ...tokens, user }
 	}
 
 	async logout(refreshToken) {
@@ -66,13 +104,29 @@ class UserService {
 			throw ApiError.UnauthorizedError();
 		}
 
-		const user = await User.findOne({where: {id: userData.id}});
-		console.log("DATA", user);
+		const user = await User.findOne({
+			where: {id: userData.id},
+			attributes: ['id', 'email', 'isActivated', 'name', 'role', 'createdAt', 'updatedAt'],
+			include: [
+				{
+					model: Basket,
+					as: 'basket',
+					attributes: ['id'],
+					include: [
+						{
+							model: BasketDevice,
+							as: 'basket_devices',
+							attributes: ['id', 'deviceId']
+						}
+					]
+				}
+			]
+		});
 		const userDto = new UserDto(user);
 		const tokens = TokenService.generateTokens({...userDto});
 		await TokenService.saveToken(userDto.id, tokens.refreshToken);
 
-		return { ...tokens, user: userDto }
+		return { ...tokens, user }
 	}
 
 	async getAllUsers() {
