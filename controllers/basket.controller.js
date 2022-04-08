@@ -13,8 +13,8 @@ class BasketController {
 
 	async createBasketDevice(req, res) {
 		try {
-			const brand = await BasketService.createBasketDevice(req.body);
-			return res.json(brand);
+			const basketDevice = await BasketService.createBasketDevice(req.body);
+			return res.json(basketDevice);
 		} catch (e) {
 			console.log(e);
 		}
@@ -22,8 +22,18 @@ class BasketController {
 
 	async getBasketDevicesById(req, res) {
 		try {
-			const brands = await BasketService.getBasketDevicesById(req.body);
-			return res.json(brands);
+			const basketDevices = await BasketService.getBasketDevicesById(req.body);
+			return res.json(basketDevices);
+		} catch (e) {
+			console.log(e)
+		}
+	}
+
+	async deleteBasketDevice(req, res) {
+		try {
+			const { id } = req.query;
+			const basketDevice = await BasketService.deleteBasketDevice(id)
+			return res.json(basketDevice);
 		} catch (e) {
 			console.log(e)
 		}

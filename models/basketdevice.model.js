@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Basket, Device }) {
       BasketDevice.belongsTo(Basket, {foreignKey: "basketId" , as: 'basket_devices'});
-      BasketDevice.belongsTo(Device, {foreignKey: "deviceId"});
+      BasketDevice.belongsTo(Device, {foreignKey: "deviceId", as: 'device'});
     }
   }
   BasketDevice.init({

@@ -1,4 +1,4 @@
-const { User, Basket, BasketDevice } = require('../models');
+const { User, Basket, BasketDevice, Device } = require('../models');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const MailService = require('./mail.service');
@@ -29,7 +29,13 @@ class UserService {
 						{
 							model: BasketDevice,
 							as: 'basket_devices',
-							attributes: ['id', 'deviceId']
+							attributes: ['id', 'deviceId'],
+							include: [
+								{
+									model: Device,
+									as: 'device'
+								}
+							]
 						}
 					]
 				}
@@ -48,7 +54,7 @@ class UserService {
 	async login({ email, password }) {
 		const user = await User.findOne({
 			where: { email },
-			attributes: ['id', 'email', 'isActivated', 'name', 'role', 'createdAt', 'updatedAt'],
+			attributes: ['id', 'email', 'isActivated', 'name', 'role', 'password', 'createdAt', 'updatedAt'],
 			include: [
 				{
 					model: Basket,
@@ -58,7 +64,13 @@ class UserService {
 						{
 							model: BasketDevice,
 							as: 'basket_devices',
-							attributes: ['id', 'deviceId']
+							attributes: ['id', 'deviceId'],
+							include: [
+								{
+									model: Device,
+									as: 'device'
+								}
+							]
 						}
 					]
 				}
@@ -67,6 +79,7 @@ class UserService {
 		if(!user) {
 			throw ApiError.BadRequest(`User not found`);
 		}
+		console.log(password, user.password)
 		const isPassEquals = await bcrypt.compare(password, user.password);
 		if(!isPassEquals) {
 			throw ApiError.BadRequest(`Incorrect password`);
@@ -116,7 +129,13 @@ class UserService {
 						{
 							model: BasketDevice,
 							as: 'basket_devices',
-							attributes: ['id', 'deviceId']
+							attributes: ['id', 'deviceId'],
+							include: [
+								{
+									model: Device,
+									as: 'device'
+								}
+							]
 						}
 					]
 				}

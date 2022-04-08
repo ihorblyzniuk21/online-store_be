@@ -1,4 +1,4 @@
-const { Basket, BasketDevice } = require('../models');
+const { Basket, BasketDevice, Device } = require('../models');
 
 class BasketService {
 	async getBasket(id) {
@@ -7,7 +7,13 @@ class BasketService {
 			include: [
 				{
 					model: BasketDevice,
-					as: 'basket_devices'
+					as: 'basket_devices',
+					include: [
+						{
+							model: Device,
+							as: 'device'
+						}
+					]
 				}
 			]
 		});
@@ -24,6 +30,13 @@ class BasketService {
 			where: {basketId}
 		})
 		return devices;
+	}
+
+	async deleteBasketDevice(id) {
+		const basketDevice = await BasketDevice.destroy({
+			where: {id}
+		})
+		return basketDevice;
 	}
 }
 

@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Device.belongsTo(Type, {foreignKey: "typeId"});
       Device.belongsTo(Brand, {foreignKey: "brandId"});
       Device.hasMany(Rating, {foreignKey: "deviceId"});
-      Device.hasMany(BasketDevice, {foreignKey: "deviceId"});
+      Device.hasMany(BasketDevice, {foreignKey: "deviceId", as: "device"});
       Device.hasMany(DeviceInfo, {foreignKey: "deviceId", as: "info"});
     }
   }
